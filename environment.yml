@@ -8,4 +8,3 @@ dependencies:
   - python=3.9.4
   - rdkit=2021.03.1
   - scikit-learn=0.24.1
-prefix: C:\Users\Heather\anaconda3\envs\auto_qsar

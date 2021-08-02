@@ -5,7 +5,7 @@ from sklearn.ensemble import RandomForestClassifier, AdaBoostClassifier
 from sklearn.naive_bayes import GaussianNB, BernoulliNB
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.svm import SVC
-
+from build_models import RANDOM_SEED
 
 def split_train_test(X, y, n_split, test_set_size, split_seed, major_subsample=None):
     """ Splits data into training and test sets"""
@@ -58,20 +58,19 @@ def split_train_test(X, y, n_split, test_set_size, split_seed, major_subsample=N
 # Algorithms is a list of tuples where item 1 is the name item 2 is a scikit-learn machine learning classifiers and
 # item 3 is the parameters to grid search through
 
-seed = 0
 
 CLASSIFIER_ALGORITHMS = [
-    ('rf', RandomForestClassifier(max_depth=10,  # max depth 10 to prevent overfitting
+    ('rf', RandomForestClassifier(max_depth=10,  # max depth 10 to prevent overfittingR
                                   class_weight='balanced',
-                                  random_state=seed), {'rf__n_estimators': [5, 10, 25]}),
+                                  random_state=RANDOM_SEED), {'rf__n_estimators': [5, 10, 25]}),
     ('nb', GaussianNB(), {}),
     ('knn', KNeighborsClassifier(metric='euclidean'), {'knn__n_neighbors': [1, 3, 5],
                                                        'knn__weights': ['uniform', 'distance']}),
     ('svc', SVC(probability=True,
                 class_weight='balanced',
-                random_state=seed), {'svc__kernel': ['rbf'],
+                random_state=RANDOM_SEED), {'svc__kernel': ['rbf'],
                                      'svc__gamma': [1e-2, 1e-3],
                                      'svc__C': [1, 10]}),
     ('bnb', BernoulliNB(alpha=1.0), {}),
-    ('ada', AdaBoostClassifier(n_estimators=100, learning_rate=0.9, random_state=seed), {})
+    ('ada', AdaBoostClassifier(n_estimators=100, learning_rate=0.9, random_state=RANDOM_SEED), {})
 ]
