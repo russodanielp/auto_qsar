@@ -5,7 +5,9 @@ from sklearn.ensemble import RandomForestClassifier, AdaBoostClassifier
 from sklearn.naive_bayes import GaussianNB, BernoulliNB
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.svm import SVC
-from build_models import RANDOM_SEED
+
+
+RANDOM_SEED = 0
 
 def split_train_test(X, y, n_split, test_set_size, split_seed, major_subsample=None):
     """ Splits data into training and test sets"""

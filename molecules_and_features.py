@@ -306,7 +306,8 @@ def make_dataset(sdf_file, data_dir=None, pred_set=False, features='MACCS', name
     }
 
     dataset_name = sdf_file.split('.')[0]
-    data_dir = os.getenv(data_dir)
+    data_dir = os.getenv(data_dir) if os.getenv(data_dir) else data_dir
+
 
     if not os.path.exists(os.path.join(data_dir, 'caches')):
         os.makedirs(os.path.join(data_dir, 'caches'))

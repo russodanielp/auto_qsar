@@ -1,6 +1,5 @@
 import argparse
 import os
-import config
 
 import joblib
 import numpy as np
@@ -10,7 +9,8 @@ from sklearn import pipeline
 from sklearn.model_selection import cross_val_predict
 from sklearn.preprocessing import StandardScaler
 
-from classic_ml import split_train_test, CLASSIFIER_ALGORITHMS
+import classic_ml as cml
+
 from config import directory_check
 from molecules_and_features import make_dataset
 from stats import get_class_stats, class_scoring
@@ -47,25 +47,23 @@ if __name__ == '__main__':
     # Check to see if necessary directories are present and if not, create them
     directory_check(data_dir)
 
+
+
     # get training data and split in training, test
     # and use a seed for reproducibility
     X, y = make_dataset(f'{dataset}.sdf', data_dir=env_var, features=features, name_col=name_col, endpoint=endpoint,
                         threshold=threshold)
-    X_train, y_train_class, X_test, y_test_class = split_train_test(X, y, n_splits, test_set_size, config.RANDOM_SEED, None)
+    X_train, y_train_class, X_test, y_test_class = cml.split_train_test(X, y, n_splits, test_set_size, RANDOM_SEED, None)
 
     if len(pd.unique(X.values.ravel('K'))) > 2:
-        CLASSIFIER_ALGORITHMS.pop(4)
+        cml.CLASSIFIER_ALGORITHMS.pop(4)
 
     else:
-        CLASSIFIER_ALGORITHMS.pop(1)
+        cml.CLASSIFIER_ALGORITHMS.pop(1)
 
-    cv = model_selection.StratifiedKFold(shuffle=True, n_splits=n_splits, random_state=config.RANDOM_SEED)
+    cv = model_selection.StratifiedKFold(shuffle=True, n_splits=n_splits, random_state=RANDOM_SEED)
 
-    for name, clf, params in CLASSIFIER_ALGORITHMS:
-        pipe = pipeline.Pipeline([('scaler', StandardScaler()), (name, clf)])
-        grid_search = model_selection.GridSearchCV(pipe, param_grid=params, cv=cv, scoring=class_scoring, refit='AUC')
-        grid_search.fit(X_train, y_train_class)
-        best_estimator = grid_search.best_estimator_
+    for name, clf, params in cml.CLASSIFIER_ALGORITHMS:
 
         if name in ['svc']:
             use_name = 'svm'
@@ -73,12 +71,23 @@ if __name__ == '__main__':
         else:
             use_name = name
 
+        mdl = save_dir = os.path.join(data_dir, 'models', f'{use_name}_{dataset}_{features}_{endpoint}_{threshold}_pipeline.pkl')
+        if os.path.exists(mdl):
+            print(f"{use_name} already trained, skipping...")
+            continue
+
+        pipe = pipeline.Pipeline([('scaler', StandardScaler()), (name, clf)])
+        grid_search = model_selection.GridSearchCV(pipe, param_grid=params, cv=cv, scoring=class_scoring, refit='AUC')
+        grid_search.fit(X_train, y_train_class)
+        best_estimator = grid_search.best_estimator_
+
+
+
         print(f'\n=======Results for {use_name}=======')
 
         # get the predictions from the best performing model in 5 fold cv
         cv_predictions = pd.DataFrame(
-            cross_val_predict(best_estimator, X_train, y_train_class, cv=cv, method='predict_proba'),
-            index=y_train_class.index)
+            cross_val_predict(best_estimator, X_train, y_train_class, cv=cv, method='predict_proba'), index=y_train_class.index)
         cv_class = cv_predictions[1].copy()
         cv_class[cv_class >= 0.5] = 1
         cv_class[cv_class < 0.5] = 0
