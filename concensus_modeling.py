@@ -6,12 +6,13 @@ import classic_ml as cml
 from build_models import make_dataset
 from stats import get_class_stats
 
-AVAILABLE_ALGORITHMS = [alg for alg, _, _ in cml.CLASSIFIER_ALGORITHMS]
+AVAILABLE_ALGORITHMS = ['rf', 'bnb', 'knn', 'svm', 'ada']
 
 
 def score_consensus(data_dir: str,
                     ds: str,
                     endpoint:str,
+                    name_col: str,
                     write_dir: str,
                     features=bm.AVAILABLE_DESCRIPTORS,
                     algorithms=AVAILABLE_ALGORITHMS,
@@ -35,7 +36,7 @@ def score_consensus(data_dir: str,
             else:
                 print("file: {}".format(filepath), " is not found")
 
-    X, y = make_dataset(f'{dataset}.sdf', data_dir=data_dir, features=features[0], name_col='NAME', endpoint=endpoint, threshold=None)
+    X, y = make_dataset(f'{dataset}.sdf', data_dir=data_dir, features=features[0], name_col=name_col, endpoint=endpoint, threshold=None)
 
     # take the average acroos all available
     # features spaces and algorithms
@@ -57,17 +58,6 @@ def score_consensus(data_dir: str,
     pd.DataFrame(stats, index=[0]).to_csv(base_file)
 
 
-
-
-
-
-
-
-
-
-
-
-
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Evalute QSAR Models')
     parser.add_argument('-ds', '--dataset', metavar='ds', type=str, help='training set name')
@@ -75,6 +65,7 @@ if __name__ == '__main__':
     parser.add_argument('-a', '--algorithms', metavar='a', type=str, help='algorithms to build model with')
     parser.add_argument('-d', '--data_dir', metavar='ev', type=str, help='project directory')
     parser.add_argument('-ep', '--endpoint', metavar='ep', type=str, help='endpoint to model')
+    parser.add_argument('-nc', '--name_col', metavar='nc', type=str, help='endpoint to model')
     parser.add_argument('-wd', '--write_dir', metavar='wd', type=str, help='directory to write the consensus model results to')
 
     args = parser.parse_args()
@@ -82,11 +73,11 @@ if __name__ == '__main__':
     dataset = args.dataset
     features = args.features.split(',') if args.features else bm.AVAILABLE_DESCRIPTORS
     algorithms = args.features.split(',') if args.algorithms else AVAILABLE_ALGORITHMS
-
+    name_col = args.name_col
     data_dir = args.data_dir
     endpoint = args.endpoint
     write_dir = args.write_dir
 
-    score_consensus(data_dir, dataset, endpoint, write_dir, features=features, algorithms=algorithms)
+    score_consensus(data_dir, dataset, endpoint, name_col, write_dir, features=features, algorithms=algorithms)
 
 
