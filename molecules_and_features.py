@@ -264,8 +264,14 @@ def get_classes(molecules, name_col='CASRN', class_col='Class'):
         name_col) else '' for mol in molecules])
 
 
-def make_dataset(sdf_file, data_dir=None, pred_set=False, features='MACCS', name_col='CASRN', endpoint=None,
-                 threshold=None, cache=True):
+def make_dataset(sdf_file,
+                 data_dir=None,
+                 pred_set=False,
+                 features='MACCS',
+                 name_col='CASRN',
+                 endpoint=None,
+                 threshold=None,
+                 cache=True):
     """
     :param sdf_file: Name of the .sdf file from which to make a dataset
     :param data_dir: Environmental variable pointing to the project directory
