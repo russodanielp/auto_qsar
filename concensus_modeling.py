@@ -57,6 +57,9 @@ def score_consensus(data_dir: str,
     base_file = os.path.join(write_dir, f'{ds}_consensus_{endpoint}_{train_or_ff}_stats.csv')
     pd.DataFrame(stats, index=[0]).to_csv(base_file)
 
+def consensus_predict(x: str):
+    pass
+
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Evalute QSAR Models')
