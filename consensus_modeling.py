@@ -47,6 +47,15 @@ def score_consensus(data_dir: str,
     consensus[consensus_copy >= 0.5] = 1
 
     consensus.columns = ['Consensus prediction across {len(data_frames)} individual models']
+
+    # convert both indexes to
+    # string.  This is necessary because
+    # sometimesm the types dont match
+    # eg., CID can be string or int
+
+    y.index = y.index.astype('str')
+    consensus.index = consensus.index.astype('str')
+
     y = y.loc[consensus.index]
 
     stats = get_class_stats(None, y, consensus)
