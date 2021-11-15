@@ -57,12 +57,11 @@ for features in features_space:
             raise Exception(f'Model {model_file_path} does not exist.')
 
 if len(preds) > 1:
-    concatenated = pd.concat(preds, axis=0)
-    consensus_preds = concatenated.groupby(concatenated.index).mean()
-    consensus_preds[consensus_preds >= 0.5] = 1
-    consensus_preds[consensus_preds < 0.5] = 0
+    consensus_preds = pd.concat(preds, axis=1).mean(1)
+    consensus_preds_copy = consensus_preds.copy()
+    consensus_preds[consensus_preds_copy >= 0.5] = 1
+    consensus_preds[consensus_preds_copy < 0.5] = 0
     final_preds = consensus_preds
-
 else:
     final_preds = preds[0]
 
