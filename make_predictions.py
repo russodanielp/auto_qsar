@@ -30,7 +30,6 @@ threshold = args.threshold
 train_name = args.train_name
 algorithms = args.algorithms.lower().split(',')
 
-
 preds = []
 
 if len(algorithms) < 1:
@@ -50,7 +49,7 @@ for features in features_space:
 
         if os.path.exists(model_file_path):
             loaded_model = load(model_file_path)
-            probabilities = pd.Series(loaded_model.predict_proba(X_pred)[:, 1], index=X_pred.index)
+            probabilities = pd.Series(loaded_model.predict_proba(X_pred)[:, 1], index=X_pred.index.astype('str'))
             preds.append(probabilities)
 
         else:
